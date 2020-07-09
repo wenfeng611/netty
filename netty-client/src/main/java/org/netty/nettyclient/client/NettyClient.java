@@ -42,7 +42,7 @@ public class NettyClient {
 
             ChannelFuture connect = b.connect(ip, port);
             connect.sync();
-            connect.channel();
+            connect.channel().writeAndFlush(new Message("aaaaa"));
         } catch (Exception e) {
             e.printStackTrace();
         }

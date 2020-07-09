@@ -20,7 +20,8 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
     protected void encode(ChannelHandlerContext channelHandlerContext, Message message, ByteBuf byteBuf) throws Exception {
         byte[] content = JSON.toJSONBytes(message);
         log.info(message.getContent());
-        //byteBuf.writeInt(content.length);
+        //读取固定长度
+        byteBuf.writeInt(content.length);
         byteBuf.writeBytes(content);
     }
 }
