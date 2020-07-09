@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 @Component
 public class NettyClient {
@@ -25,9 +26,13 @@ public class NettyClient {
     @Autowired
     ClientChannelInitializer clientChannelInitializer;
 
+    Channel channel;
+
+    EventLoopGroup worker = new NioEventLoopGroup();
+
     @PostConstruct
     public void bind() {
-        EventLoopGroup worker = new NioEventLoopGroup();
+
         try {
             Bootstrap b = new Bootstrap();
             b.group(worker).channel(NioSocketChannel.class)
@@ -37,10 +42,19 @@ public class NettyClient {
 
             ChannelFuture connect = b.connect(ip, port);
             connect.sync();
-            connect.channel().writeAndFlush(new Message("hello"));
+            connect.channel();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
         }
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        // 关闭 Netty Client
+        if (channel != null) {
+            channel.close();
+        }
+        // 优雅关闭一个 EventLoopGroup 对象
+        worker.shutdownGracefully();
     }
 }
